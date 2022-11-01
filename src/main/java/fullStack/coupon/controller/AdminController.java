@@ -1,26 +1,21 @@
 package fullStack.coupon.controller;
 
-import fullStack.coupon.exeption.CompanyNotFoundException;
 import fullStack.coupon.exeption.EmailExistsException;
 import fullStack.coupon.exeption.NotFoundException;
 import fullStack.coupon.model.Company;
 import fullStack.coupon.model.Customer;
 import fullStack.coupon.repository.CompanyRepository;
 import fullStack.coupon.service.AdminService;
+import java.util.List;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-
 @RestController
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class AdminController {
     @Autowired
     private AdminService service;

@@ -1,31 +1,26 @@
 package fullStack.coupon.controller;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import fullStack.coupon.exeption.*;
+import fullStack.coupon.exeption.AddFailedException;
+import fullStack.coupon.exeption.CouponNotFoundException;
+import fullStack.coupon.exeption.NotFoundException;
 import fullStack.coupon.model.Category;
 import fullStack.coupon.model.Company;
 import fullStack.coupon.model.Coupon;
-import fullStack.coupon.model.Credentials;
-import fullStack.coupon.repository.CompanyRepository;
 import fullStack.coupon.repository.CouponRepository;
 import fullStack.coupon.service.CompanyService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class CompanyController {
 
     @Autowired
     private CouponRepository couponRepository;
+
     @Autowired
     private CompanyService companyService;
 
@@ -33,8 +28,9 @@ public class CompanyController {
     Coupon addCoupon(@RequestBody Coupon coupon) throws AddFailedException {
         return companyService.addCoupon(coupon);
     }
+
     @PutMapping("/coupon/{id}")
-    Coupon updateCoupon(@RequestBody Coupon coupon){
+    Coupon updateCoupon(@RequestBody Coupon coupon) {
         return companyService.updateCoupon(coupon)
                 .map(coup -> {
                     coup.setTitle(coupon.getTitle());
@@ -47,8 +43,9 @@ public class CompanyController {
                     coup.setCategory(coupon.getCategory());
                     coup.setCompany(coupon.getCompany());
                     return couponRepository.save(coup);
-                }).orElseThrow(()-> new CouponNotFoundException(coupon.getId()));
+                }).orElseThrow(() -> new CouponNotFoundException(coupon.getId()));
     }
+
     @DeleteMapping("/coupon/{id}")
     String deleteCoupon(@PathVariable int id) {
         if (!couponRepository.existsById(id)) {
@@ -58,46 +55,42 @@ public class CompanyController {
         return "Coupon with id " + id + " has been deleted.";
     }
 
-//    @GetMapping("/coupon/{id}")-------------------------------------------??????????????????????????????
-//    Coupon getCouponById(@PathVariable int id){
-//        return companyService.getOneCouponByCompanyId(id);
-//    }
-
     @GetMapping("/coupon/{id}")
-    Coupon getCouponById(@PathVariable int id){
-        return couponRepository.findById(id).orElseThrow(()-> new CouponNotFoundException(id));
+    Coupon getCouponById(@PathVariable int id) {
+        return couponRepository.findById(id).orElseThrow(() -> new CouponNotFoundException(id));
     }
 
     @GetMapping(path = "comp/{id}")
-    ResponseEntity<?> getCouponsCompany(@RequestBody Company company){
+    ResponseEntity<?> getCouponsCompany(@RequestBody Company company) {
         List<Coupon> coupons = companyService.getCompanyCoupons(company);
-        if (coupons.size() != 0)
+        if (coupons.size() != 0) {
             return ResponseEntity.ok(coupons.toString());
+        }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found....");
     }
 
     @GetMapping(path = "/category")
-    ResponseEntity<?> getCouponsByCategory (@RequestParam Category category, int id){
+    ResponseEntity<?> getCouponsByCategory(@RequestParam Category category, int id) {
         try {
             return ResponseEntity.ok(companyService.getCompanyCouponsByCategory(id, category));
         } catch (NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    @GetMapping (path = "/maxprice/{p}")
-    ResponseEntity<?> getByMaxPrice (@PathVariable double max_price){
+
+    @GetMapping(path = "/maxprice/{p}")
+    ResponseEntity<?> getByMaxPrice(@PathVariable double max_price) {
         try {
             return ResponseEntity.ok(companyService.getCompanyCouponsByMaxPrice(max_price));
         } catch (NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    @GetMapping (path = "/details")
+
+    @GetMapping(path = "/details")
     Company getOneCompany(@PathVariable int id) throws NotFoundException {
-    return companyService.getCompanyDetails(id);
-}
-
-
+        return companyService.getCompanyDetails(id);
+    }
 
 
 }
