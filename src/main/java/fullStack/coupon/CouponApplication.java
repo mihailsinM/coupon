@@ -1,11 +1,7 @@
 package fullStack.coupon;
 
-import fullStack.coupon.service.AdminService;
-import fullStack.coupon.service.CompanyService;
-import fullStack.coupon.service.CustomerService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class CouponApplication {
